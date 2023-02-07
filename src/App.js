@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import "./App.css";
 import { createGlobalStyle } from "styled-components";
 import TodoTemplate from "./components/TodoTemplate";
@@ -12,12 +13,28 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function App() {
+  const [todos, setTodos] = useState([]);
+  const leftTasks = todos.filter((todo) => todo.done === false);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/todos")
+      .then((res) => {
+        if (!res.ok) {
+          throw Error("could not fetch the data for that resource");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setTodos(data);
+      });
+  }, []);
+
   return (
     <>
       <GlobalStyle />
       <TodoTemplate>
-        <TodoHead />
-        <TodoList />
+        <TodoHead leftTasks={leftTasks.length} />
+        <TodoList todos={todos} />
         <TodoCreate />
       </TodoTemplate>
     </>

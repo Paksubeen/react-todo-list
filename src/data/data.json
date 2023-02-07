@@ -1,0 +1,29 @@
+{
+  "todos": [
+    {
+      "id": 1,
+      "text": "Daily Coding",
+      "done": true
+    },
+    {
+      "id": 2,
+      "text": "솔로 프로젝트",
+      "done": true
+    },
+    {
+      "id": 3,
+      "text": "과제 제출하기",
+      "done": true
+    },
+    {
+      "id": 4,
+      "text": "소그룹 피드백",
+      "done": false
+    },
+    {
+      "id": 5,
+      "text": "회고 블로깅",
+      "done": false
+    }
+  ]
+}

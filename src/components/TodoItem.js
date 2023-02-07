@@ -57,7 +57,7 @@ const Text = styled.div`
     `}
 `;
 
-function TodoItem({ done, text }) {
+function TodoItem({ id, done, text }) {
   return (
     <TodoItemBlock>
       <CheckCircle done={done}>{done && <MdDone />}</CheckCircle>

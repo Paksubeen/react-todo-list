@@ -20,12 +20,20 @@ const TodoHeadBlock = styled.div`
   }
 `;
 
-function TodoHead() {
+function TodoHead({ leftTasks }) {
+  const today = new Date();
+  const dateString = today.toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const dayName = today.toLocaleDateString("ko-KR", { weekday: "long" });
+
   return (
     <TodoHeadBlock>
-      <h1>2023년 2월 5일</h1>
-      <div className="day">일요일</div>
-      <div className="tasks">5 Tasks</div>
+      <h1>{dateString}</h1>
+      <div className="day">{dayName}</div>
+      <div className="tasks">{leftTasks} Tasks</div>
     </TodoHeadBlock>
   );
 }
