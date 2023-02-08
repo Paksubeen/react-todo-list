@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styled, { css } from "styled-components";
 import { MdDone, MdDelete } from "react-icons/md";
 
@@ -35,6 +36,7 @@ const CheckCircle = styled.div`
   border-radius: 16px;
   border: 1px solid #888888;
   font-size: 24px;
+  color: #ffffff;
   cursor: pointer;
   ${(props) =>
     props.done &&
@@ -58,10 +60,37 @@ const Text = styled.div`
 `;
 
 function TodoItem({ id, done, text }) {
+  const [isDone, setIsDone] = useState(done);
+  console.log(isDone);
+
+  const onCheck = () => {
+    setIsDone(!isDone);
+    fetch(`http://localhost:3001/todos/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        done: !isDone,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw Error("could not fetch the data for that resource");
+        }
+        return res.json();
+      })
+      .catch((error) => {
+        console.error("Error", error);
+      });
+  };
+
   return (
     <TodoItemBlock>
-      <CheckCircle done={done}>{done && <MdDone />}</CheckCircle>
-      <Text done={done}>{text}</Text>
+      <CheckCircle done={isDone} onClick={onCheck}>
+        {isDone && <MdDone />}
+      </CheckCircle>
+      <Text done={isDone}>{text}</Text>
       <Remove>
         <MdDelete />
       </Remove>
