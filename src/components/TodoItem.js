@@ -1,29 +1,11 @@
 import { useState } from "react";
 import styled, { css } from "styled-components";
-import { MdDone, MdDelete } from "react-icons/md";
-
-const Remove = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: #cccccc;
-  cursor: pointer;
-  &:hover {
-    color: #ff6b6b;
-  }
-  display: none;
-`;
+import { MdDone, MdEdit, MdAutoFixHigh, MdDelete } from "react-icons/md";
 
 const TodoItemBlock = styled.div`
   display: flex;
   align-items: center;
   padding: 12px 0;
-  &:hover {
-    ${Remove} {
-      display: initial;
-    }
-  }
 `;
 
 const CheckCircle = styled.div`
@@ -47,6 +29,10 @@ const CheckCircle = styled.div`
     `}
 `;
 
+const EditForm = styled.form`
+  flex: 1;
+`;
+
 const Text = styled.div`
   flex: 1;
   font-size: 20px;
@@ -59,10 +45,49 @@ const Text = styled.div`
     `}
 `;
 
-function TodoItem({ id, done, text }) {
-  const [isDone, setIsDone] = useState(done);
-  console.log(isDone);
+const EditText = styled.input`
+  width: 100%;
+  padding: 3px 0;
+  border: none;
+  outline: none;
+  font-size: 20px;
+  color: #444444;
+  border-bottom: 1px solid #e9ecef;
+`;
 
+const Edit = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 16px;
+  margin-right: 8px;
+  font-size: 24px;
+  color: #cccccc;
+  cursor: pointer;
+  &:hover {
+    color: #5588fe;
+  }
+`;
+
+const Remove = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #cccccc;
+  cursor: pointer;
+  &:hover {
+    color: #ff6b6b;
+  }
+`;
+
+function TodoItem({ id, done, text }) {
+  const [value, setValue] = useState(text);
+  const [isDone, setIsDone] = useState(done);
+  const [isEdit, setIsEdit] = useState(false);
+
+  const onEdit = () => setIsEdit(!isEdit);
+  const onChange = (e) => setValue(e.target.value);
   const onCheck = () => {
     setIsDone(!isDone);
     fetch(`http://localhost:3001/todos/${id}`, {
@@ -80,6 +105,48 @@ function TodoItem({ id, done, text }) {
         }
         return res.json();
       })
+      .then(() => {
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Error", error);
+      });
+  };
+  const onSubmit = () => {
+    setIsEdit(!isEdit);
+    fetch(`http://localhost:3001/todos/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        text: value,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw Error("could not fetch the data for that resource");
+        }
+        return res.json();
+      })
+      .then(() => {
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error("Error", error);
+      });
+  };
+  const onRemove = () => {
+    fetch(`http://localhost:3001/todos/${id}`, { method: "DELETE" })
+      .then((res) => {
+        if (!res.ok) {
+          throw Error("could not fetch the data for that resource");
+        }
+        return res.json();
+      })
+      .then(() => {
+        window.location.reload();
+      })
       .catch((error) => {
         console.error("Error", error);
       });
@@ -90,8 +157,26 @@ function TodoItem({ id, done, text }) {
       <CheckCircle done={isDone} onClick={onCheck}>
         {isDone && <MdDone />}
       </CheckCircle>
-      <Text done={isDone}>{text}</Text>
-      <Remove>
+      {!isEdit ? (
+        <Text done={isDone}>{text}</Text>
+      ) : (
+        <EditForm onSubmit={onSubmit}>
+          <EditText
+            autoFocus
+            placeholder="할 일을 입력 후 Enter를 누르세요"
+            value={value}
+            onChange={onChange}
+          ></EditText>
+        </EditForm>
+      )}
+      <Edit>
+        {!isEdit ? (
+          <MdEdit onClick={onEdit} />
+        ) : (
+          <MdAutoFixHigh onClick={onSubmit} />
+        )}
+      </Edit>
+      <Remove onClick={onRemove}>
         <MdDelete />
       </Remove>
     </TodoItemBlock>
